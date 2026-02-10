@@ -45,17 +45,47 @@ export MYSQL_DATABASE=your_database  # Optional: leave empty to scan all databas
 
 Or copy `.env.example` to `.env` and update with your credentials.
 
+#### Quick Start with Runner Script
+
+The easiest way to run the tool is using the `run.sh` script, which automatically:
+- Creates and activates the Python virtual environment
+- Installs dependencies if needed
+- Loads your `.env` configuration
+- Validates database credentials
+- Runs the analysis
+
+```bash
+# First time setup
+cp .env.example .env
+# Edit .env with your database credentials
+
+# Run the analysis
+./run.sh
+
+# Or with options
+./run.sh --output-html report.html
+./run.sh --output-csv data.csv
+```
+
 #### Usage
 
 **Detailed Report (Default)** - Comprehensive analysis with statistics:
 
 ```bash
+# Using runner script (recommended)
+./run.sh
+
+# Or directly with Python
 python find_unused_indexes.py
 ```
 
 **Simple Report** - Quick list of unused indexes only:
 
 ```bash
+# Using runner script
+DETAILED_REPORT=false ./run.sh
+
+# Or directly with Python
 export DETAILED_REPORT=false
 python find_unused_indexes.py
 ```
@@ -74,27 +104,28 @@ The detailed report includes:
 **Generate HTML Report** - Beautiful, styled report for sharing:
 
 ```bash
-python find_unused_indexes.py --output-html index_report.html
+./run.sh --output-html index_report.html
 ```
 
 **Generate CSV Report** - Raw data for spreadsheet analysis:
 
 ```bash
-python find_unused_indexes.py --output-csv index_report.csv
+./run.sh --output-csv index_report.csv
 ```
 
 **Generate Both** - HTML for viewing + CSV for analysis:
 
 ```bash
-python find_unused_indexes.py --output-html report.html --output-csv report.csv
+./run.sh --output-html report.html --output-csv report.csv
 ```
 
 **Via Environment Variables:**
 
 ```bash
+# Add to .env file or export
 export OUTPUT_HTML=report.html
 export OUTPUT_CSV=report.csv
-python find_unused_indexes.py
+./run.sh
 ```
 
 The HTML report includes:
