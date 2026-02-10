@@ -58,7 +58,7 @@ def generate_html_report(
             padding: 20px;
         }}
         .container {{
-            max-width: 1400px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             padding: 40px;
