@@ -276,7 +276,6 @@ def generate_html_report(
                     <th>Table</th>
                     <th>Index Name</th>
                     <th>Columns</th>
-                    <th>Type</th>
                     <th>FK</th>
                     <th class="number">Cardinality</th>
                 </tr>
@@ -297,7 +296,6 @@ def generate_html_report(
                     <td>{table_full}</td>
                     <td><code>{html.escape(idx['index_name'])}</code></td>
                     <td>{columns}</td>
-                    <td>{html.escape(idx['type'] or 'N/A')}</td>
                     <td><span class="badge {badge_class}">{badge_text}</span></td>
                     <td class="number">{cardinality}</td>
                 </tr>
@@ -307,7 +305,7 @@ def generate_html_report(
                 size_info = table_sizes[idx['schema']][idx['table']]
                 html_content += f"""
                 <tr>
-                    <td colspan="6" class="table-sub">
+                    <td colspan="5" class="table-sub">
                         Table size: {size_info['total_mb']:.2f} MB
                         (data: {size_info['data_mb']:.2f} MB, indexes: {size_info['index_mb']:.2f} MB)
                     </td>
