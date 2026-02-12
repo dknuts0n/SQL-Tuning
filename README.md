@@ -4,7 +4,7 @@ A collection of tools and scripts for MySQL database performance tuning and opti
 
 ## Tools
 
-### Find Unused Indexes
+### 1. Find Unused Indexes
 
 `find_unused_indexes.py` - Identifies indexes that are not being used by queries.
 
@@ -234,3 +234,130 @@ ALTER TABLE mydb.orders DROP INDEX idx_created_date;
 END OF REPORT
 ====================================================================================================
 ```
+
+---
+
+### 2. Adaptive Hash Index Monitor
+
+`monitor_adaptive_hash.py` - Monitors MySQL InnoDB Adaptive Hash Index (AHI) performance and effectiveness.
+
+The Adaptive Hash Index is an InnoDB optimization that automatically builds hash indexes for frequently accessed index pages. This tool helps you determine if AHI is beneficial for your workload.
+
+#### Quick Start with Runner Script
+
+```bash
+# Single snapshot of AHI status
+./run_ahi_monitor.sh
+
+# Monitor continuously every 5 seconds
+./run_ahi_monitor.sh --interval 5
+
+# Monitor for 60 seconds with updates every 10 seconds
+./run_ahi_monitor.sh --interval 10 --duration 60
+
+# Generate HTML report
+./run_ahi_monitor.sh --output-html ahi_report.html
+
+# Monitor and generate report
+./run_ahi_monitor.sh --interval 5 --duration 60 --output-html ahi_report.html
+```
+
+#### Usage Options
+
+**Single Snapshot** - Get current AHI status:
+```bash
+./run_ahi_monitor.sh
+```
+
+**Continuous Monitoring** - Track AHI performance over time:
+```bash
+# Monitor every 5 seconds indefinitely (Ctrl+C to stop)
+./run_ahi_monitor.sh --interval 5
+
+# Monitor for specific duration
+./run_ahi_monitor.sh --interval 5 --duration 60
+```
+
+**Generate Reports**:
+```bash
+# HTML report with visualizations
+./run_ahi_monitor.sh --output-html ahi_report.html
+
+# Combined monitoring and reporting
+./run_ahi_monitor.sh --interval 10 --duration 120 --output-html ahi_report.html
+```
+
+#### What It Monitors
+
+The tool tracks the following AHI metrics:
+
+- **Configuration**: AHI enabled status, partition count, buffer pool size
+- **Hit Rate**: Percentage of searches satisfied by AHI vs B-tree lookups
+- **Search Statistics**: Total AHI searches and B-tree searches
+- **Memory Usage**: Hash table size and buffer allocation
+- **Page Operations**: Pages added to and removed from AHI
+- **Row Operations**: Row-level AHI activity (additions, updates, removals)
+
+#### Performance Interpretation
+
+The tool automatically interprets AHI effectiveness:
+
+- **≥80% hit rate**: Excellent - AHI is highly effective for your workload
+- **60-79% hit rate**: Good - AHI is providing measurable benefits
+- **40-59% hit rate**: Moderate - AHI may provide some benefit
+- **<40% hit rate**: Low - Consider disabling AHI for your workload
+
+#### When to Use AHI
+
+**Enable AHI when:**
+- You have a read-heavy workload
+- Queries repeatedly access the same index pages
+- You see high buffer pool read activity
+- Hit rate is consistently above 60%
+
+**Consider disabling AHI when:**
+- You have a write-heavy workload
+- Access patterns are highly random
+- Hit rate is consistently below 40%
+- You need to reduce memory overhead
+
+#### Example Output
+
+```
+==============================================================================
+Adaptive Hash Index Status - 2025-01-15 10:30:45
+==============================================================================
+
+Configuration:
+  AHI Enabled: True
+  AHI Partitions: 8
+  Buffer Pool Size: 8.00 GB
+
+Memory Usage:
+  Hash Table Size: 276,671
+  Hash Buffers: 2,208
+
+Search Statistics:
+  Total AHI Searches: 45,892,341
+  B-tree Searches: 8,234,567
+  AHI Hit Rate: 82.05%
+    Status: Excellent - AHI is highly effective
+
+Page Operations:
+  Pages Added: 156,789
+  Pages Removed: 12,345
+
+Row Operations:
+  Rows Added: 2,345,678
+  Rows Removed: 234,567
+  Rows Updated: 456,789
+  Rows Deleted (no hash entry): 12,345
+```
+
+#### Important Notes
+
+- AHI metrics are cumulative since server start
+- The tool automatically enables InnoDB AHI metrics if not already active
+- Monitor over a representative workload period for accurate assessment
+- AHI effectiveness varies significantly based on access patterns
+- Changes to AHI settings require a server restart in some MySQL versions
